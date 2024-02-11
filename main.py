@@ -1,8 +1,9 @@
 from tkinter import *
-
+from tkinter import messagebox
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
+
 
 def save_data():
 
@@ -10,11 +11,17 @@ def save_data():
     get_web = entry_web.get()
     get_pass = entry_pass.get()
 
-    with open("data.txt", "a") as file:
-        file.write(f"\n{get_web} | {get_mail} | {get_pass}")
-        entry_pass.delete(0, END)
-        entry_web.delete(0, END)
+    if len(get_pass) == 0 or len(get_web) == 0:
+        messagebox.showwarning(title="Missing İnput Error", message="You must fill all boxes !")
+    else:
+        is_ok = messagebox.askyesno(title=get_web, message=f"These are the the detailes entered: \nEmail: {get_mail}"
+                                                   f"\nPassword: {get_pass}\nIs it ok to save ?")
 
+        if is_ok and get_pass is not None and get_web is not None:
+            with open("data.txt", "a") as file:
+                file.write(f"\n{get_web} | {get_mail} | {get_pass}")
+                entry_pass.delete(0, END)
+                entry_web.delete(0, END)
 
 
 # ---------------------------- UI SETUP ------------------------------- #
