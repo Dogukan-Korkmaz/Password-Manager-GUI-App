@@ -1,6 +1,15 @@
 from tkinter import *
 from tkinter import messagebox
+from gen_pass import generate_password
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
+
+
+def write_new_password():
+    if len(entry_pass.get()) == 0:
+        entry_pass.insert(0, generate_password())
+    else:
+        entry_pass.delete(0, END)
+        entry_pass.insert(0, generate_password())
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
@@ -55,7 +64,7 @@ label_pass.grid(row=3, column=0)
 entry_pass = Entry(width=27)
 entry_pass.grid(row=3, column=1)
 
-button_gpass = Button(text="Generate Password")
+button_gpass = Button(text="Generate Password", command=write_new_password)
 button_gpass.grid(row=3, column=2)
 
 button_add = Button(width=29, text="Add", command=save_data)
