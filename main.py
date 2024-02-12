@@ -1,6 +1,24 @@
 from tkinter import *
 from tkinter import messagebox
 from gen_pass import generate_password
+import json
+# ---------------------------- Search ------------------------------- #
+
+
+def search_website():
+    website = entry_web.get()
+    try:
+        with open("data.json") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        messagebox.showinfo(title="Error", message="No Data File Found.")
+    else:
+        if website in data:
+            email = data[website]["email"]
+            password = data[website]["password"]
+            messagebox.showinfo(title=website, message=f"Email: {email}\nPassword: {password}")
+        else:
+            messagebox.showinfo(title="Error", message=f"No details for {website} exists.")
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 
@@ -19,18 +37,33 @@ def save_data():
     get_mail = entry_mail.get()
     get_web = entry_web.get()
     get_pass = entry_pass.get()
+    new_data = {
+        get_web: {
+            "email": get_mail,
+            "password": get_pass,
+        }
+    }
 
     if len(get_pass) == 0 or len(get_web) == 0:
         messagebox.showwarning(title="Missing İnput Error", message="You must fill all boxes !")
     else:
-        is_ok = messagebox.askyesno(title=get_web, message=f"These are the the detailes entered: \nEmail: {get_mail}"
-                                                   f"\nPassword: {get_pass}\nIs it ok to save ?")
+        try:
+            with open("data.json", "r") as data_file:
+                # Reading old data
+                data = json.load(data_file)
+        except FileNotFoundError:
+            with open("data.json", "w") as data_file:
+                json.dump(new_data, data_file, indent=4)
+        else:
+            # Updating old data with new data
+            data.update(new_data)
 
-        if is_ok and get_pass is not None and get_web is not None:
-            with open("data.txt", "a") as file:
-                file.write(f"\n{get_web} | {get_mail} | {get_pass}")
-                entry_pass.delete(0, END)
-                entry_web.delete(0, END)
+            with open("data.json", "w") as data_file:
+                # Saving updated data
+                json.dump(data, data_file, indent=4)
+        finally:
+            entry_pass.delete(0, END)
+            entry_web.delete(0, END)
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -47,14 +80,17 @@ canvas.grid(row=0, column=1)
 label_web = Label(text="Website:")
 label_web.grid(row=1, column=0)
 
-entry_web = Entry(width=35)
+entry_web = Entry(width=28)
 entry_web.focus()
-entry_web.grid(row=1, column=1, columnspan=2)
+entry_web.grid(row=1, column=1)
+
+button_web = Button(text="Search", command=search_website, width=12)
+button_web.grid(row=1, column=2)
 
 label_mail = Label(text="Email/Username:")
 label_mail.grid(row=2, column=0)
 
-entry_mail = Entry(width=35)
+entry_mail = Entry(width=45)
 entry_mail.grid(row=2, column=1, columnspan=2)
 entry_mail.insert(0, "dkorkmaz2000@hotmail.com")
 
@@ -67,7 +103,7 @@ entry_pass.grid(row=3, column=1)
 button_gpass = Button(text="Generate Password", command=write_new_password)
 button_gpass.grid(row=3, column=2)
 
-button_add = Button(width=29, text="Add", command=save_data)
+button_add = Button(width=37, text="Add", command=save_data)
 button_add.grid(row=4, column=1, columnspan=2)
 
 
